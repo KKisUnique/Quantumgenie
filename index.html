@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Genie Website</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        .container {
+          width: 70%;
+          margin-bottom: 20px;
+        }
+        input, textarea, button {
+            margin: 5px;
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+        button {
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+        }
+        button:hover {
+            background-color: #367c39;
+        }
+        #results {
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            padding: 10px;
+        }
+         .error {
+           color: red;
+           font-weight: bold;
+         }
+    </style>
+</head>
+<body>
+    <h1>Quantum Genie</h1>
+
+    <div class="container">
+      <h2>Explain Topic</h2>
+        <input type="text" id="explain-topic" placeholder="Enter topic name">
+        <button onclick="explain()">Explain</button>
+          <div id="explain-result"></div>
+    </div>
+
+    <div class="container">
+      <h2>Practice Question</h2>
+        <button onclick="practice()">Get Question</button>
+        <div id="practice-result"></div>
+    </div>
+
+    <div class="container">
+      <h2>Summarize Notes</h2>
+        <textarea id="summarize-notes" placeholder="Enter your notes"></textarea>
+        <button onclick="summarize()">Summarize</button>
+          <div id="summarize-result"></div>
+    </div>
+
+    <script>
+      const API_BASE = 'https://your-api.com'; // Replace with the actual API base URL
+
+      async function fetchFromApi(endpoint){
+        try {
+             const response = await fetch(API_BASE + endpoint);
+             if(!response.ok){
+              throw new Error(`HTTP error! status: ${response.status}`);
+             }
+             return await response.json();
+         } catch (error) {
+              console.error('Error fetching data:', error);
+              return {"error": error.message};
+         }
+      }
+
+      async function explain() {
+          const topic = document.getElementById('explain-topic').value;
+          const resultDiv = document.getElementById('explain-result');
+          resultDiv.textContent = 'Loading...';
+          const response = await fetchFromApi(`/explain?topic=${topic}`);
+
+          if (response.error) {
+              resultDiv.textContent = `Error: ${response.error}`;
+              resultDiv.classList.add('error')
+          }
+          else{
+             resultDiv.textContent = `Explanation: ${response.explanation}`;
+             resultDiv.classList.remove('error');
+           }
+       }
+
+
+      async function practice() {
+          const resultDiv = document.getElementById('practice-result');
+           resultDiv.textContent = 'Loading...';
+           const response = await fetchFromApi('/practice');
+
+         if (response.error) {
+              resultDiv.textContent = `Error: ${response.error}`;
+              resultDiv.classList.add('error');
+          }
+          else{
+            resultDiv.textContent = `Question: ${response.question}`;
+            resultDiv.classList.remove('error');
+         }
+      }
+
+      async function summarize() {
+          const notes = document.getElementById('summarize-notes').value;
+          const resultDiv = document.getElementById('summarize-result');
+            resultDiv.textContent = 'Loading...';
+          const response = await fetchFromApi(`/summarize?notes=${notes}`);
+
+        if (response.error) {
+             resultDiv.textContent = `Error: ${response.error}`;
+              resultDiv.classList.add('error');
+          }
+          else {
+             resultDiv.textContent = `Summary: ${response.summary}`;
+             resultDiv.classList.remove('error');
+          }
+       }
+    </script>
+</body>
+</html>
